@@ -11,6 +11,13 @@ from .clone import clone_repo
 from .analyzers.lizard import analyze_lizard
 from .analyzers.semgrep import analyze_semgrep
 from .analyzers.dependency_analyzer import analyze_unused_dependencies, analyze_unused_python_packages
+from .analyzers.coverage import analyze_code_coverage
+from .analyzers.testing_quality import analyze_testing_quality
+from .analyzers.documentation import analyze_documentation_quality
+from .analyzers.ci_cd import analyze_ci_cd_pipeline
+from .analyzers.compliance import analyze_compliance_standards
+from .analyzers.api_quality import analyze_api_quality
+from .analyzers.monitoring import analyze_monitoring_logging
 from .config_detector import detect_config_files
 from .scoring import compute_scores
 from .report import generate_markdown
@@ -75,6 +82,8 @@ def assess(repo_url: str, output: str, fail_under: Optional[int]) -> None:
             semgrep_metrics = {}
 
         metrics = {**lizard_metrics, **semgrep_metrics}
+        # Provide repo root for fallback estimators
+        metrics['repo_root'] = str(tmp_dir)
         # Ensure semgrep_findings is present in metrics for report
         if 'semgrep_findings' in semgrep_metrics:
             metrics['semgrep_findings'] = semgrep_metrics['semgrep_findings']
@@ -93,6 +102,48 @@ def assess(repo_url: str, output: str, fail_under: Optional[int]) -> None:
         metrics['python_dependencies'] = py_deps
         progress.update(task, description="Dependency analysis complete")
 
+        # Analyze code coverage
+        task = progress.add_task("Analyzing code coverage...", total=None)
+        coverage_metrics = analyze_code_coverage(tmp_dir)
+        metrics.update(coverage_metrics)
+        progress.update(task, description="Coverage analysis complete")
+
+        # Analyze testing quality
+        task = progress.add_task("Analyzing testing quality...", total=None)
+        testing_metrics = analyze_testing_quality(tmp_dir)
+        metrics.update(testing_metrics)
+        progress.update(task, description="Testing quality analysis complete")
+
+        # Analyze documentation quality
+        task = progress.add_task("Analyzing documentation...", total=None)
+        docs_metrics = analyze_documentation_quality(tmp_dir)
+        metrics.update(docs_metrics)
+        progress.update(task, description="Documentation analysis complete")
+
+        # Analyze CI/CD pipeline
+        task = progress.add_task("Analyzing CI/CD pipeline...", total=None)
+        ci_cd_metrics = analyze_ci_cd_pipeline(tmp_dir)
+        metrics.update(ci_cd_metrics)
+        progress.update(task, description="CI/CD analysis complete")
+
+        # Analyze compliance and standards
+        task = progress.add_task("Analyzing compliance...", total=None)
+        compliance_metrics = analyze_compliance_standards(tmp_dir)
+        metrics.update(compliance_metrics)
+        progress.update(task, description="Compliance analysis complete")
+
+        # Analyze API quality
+        task = progress.add_task("Analyzing API quality...", total=None)
+        api_metrics = analyze_api_quality(tmp_dir)
+        metrics.update(api_metrics)
+        progress.update(task, description="API quality analysis complete")
+
+        # Analyze monitoring and logging
+        task = progress.add_task("Analyzing monitoring...", total=None)
+        monitoring_metrics = analyze_monitoring_logging(tmp_dir)
+        metrics.update(monitoring_metrics)
+        progress.update(task, description="Monitoring analysis complete")
+
         task = progress.add_task("Computing scores...", total=None)
         scores = compute_scores(metrics)
         progress.update(task, description="Scores computed")
@@ -101,8 +152,12 @@ def assess(repo_url: str, output: str, fail_under: Optional[int]) -> None:
         generate_markdown(scores, output)
         progress.update(task, description=f"Report generated: {output}")
 
-    overall_score = scores.get('overall', 0)
-    console.print(f"[green]Overall Score: {overall_score:.1f}[/green]")
+    overall_score = scores.get('overall_score', 0.0)
+    overall_display = overall_score if overall_score is not None else 'null'
+    try:
+        console.print(f"[green]Overall Score: {overall_display:.1f}[/green]")
+    except Exception:
+        console.print(f"[green]Overall Score: {overall_display}[/green]")
 
     if fail_under and overall_score < fail_under:
         console.print(f"[red]Score {overall_score:.1f} is below threshold {fail_under}[/red]")
