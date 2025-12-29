@@ -97,8 +97,8 @@ repo-quality https://github.com/user/repo --output report.md --fail-under 80
 
 ```bash
 # Analyze different projects and compare
-repo-quality https://github.com/torvalds/linux --output linux-report.md
-repo-quality https://github.com/torvalds/subsurface-for-dirk --output subsurface-report.md
+repo-quality https://github.com/{{your-repo}} --output repo1-report.md
+repo-quality https://github.com/{{your-other-repo}} --output repo2-report.md
 ```
 
 **Local development workflow:**
@@ -205,8 +205,9 @@ The generated Markdown report contains these sections:
 ### 2. Metrics Summary Table
 
 A quick reference table showing:
+
 - Maintainability score with grade
-- Security score with grade  
+- Security score with grade
 - Structure score with grade
 - Testing Quality (if available)
 - Code Coverage (if available)
@@ -223,14 +224,17 @@ Each metric shows `null` with a reason if data is unavailable.
 Breaking down complexity, duplication, and security findings:
 
 **Complexity metrics:**
+
 - Average Cyclomatic Complexity: Measures function complexity (lower is better, ideal < 10)
 - Max Cyclomatic Complexity: Peak complexity in the codebase
 - % Functions CCN > 10: Percentage of complex functions (should be < 20%)
 
 **Duplication metrics:**
+
 - Code Duplication %: Percentage of duplicated code blocks (should be < 5%)
 
 **Security findings:**
+
 - Critical vulnerabilities (requires immediate attention)
 - High-severity issues (address in next sprint)
 - Medium-severity issues (plan for future)
@@ -239,10 +243,12 @@ Breaking down complexity, duplication, and security findings:
 ### 4. Configuration & Workflow Files
 
 Checklist showing presence of standard files:
+
 - ✅ = File exists and proper configuration detected
 - ❌ = File missing or not properly configured
 
 Files checked:
+
 - `.github/workflows/` (GitHub Actions)
 - `.gitignore`
 - `eslintrc.js` or similar (Linting config)
@@ -257,6 +263,7 @@ Files checked:
 Detailed analysis of code complexity:
 
 **Halstead Metrics (for main files):**
+
 - **Vocabulary**: Count of unique operators and operands
 - **Length**: Total count of operators and operands
 - **Volume**: Program length weighted by vocabulary
@@ -265,6 +272,7 @@ Detailed analysis of code complexity:
 
 **Risky Functions:**
 Table of the 3 most complex functions with:
+
 - Function name and file location
 - Cyclomatic Complexity (CCN) score
 - Number of parameters
@@ -272,6 +280,7 @@ Table of the 3 most complex functions with:
 ### 6. Security Findings (Limited Display)
 
 Top 10 security vulnerabilities from Semgrep analysis:
+
 - File location and line number
 - Rule ID and category
 - Severity level
@@ -282,6 +291,7 @@ Top 10 security vulnerabilities from Semgrep analysis:
 ### 7. Dependency Analysis
 
 Lists unused and suspicious dependencies:
+
 - **npm packages** from `package.json`
 - **Python packages** from `requirements.txt` or `pyproject.toml`
 - Percentage of declared dependencies actually used in code
@@ -289,6 +299,7 @@ Lists unused and suspicious dependencies:
 ### 8. Quality Issues
 
 Detected code quality problems:
+
 - TODO/FIXME comments requiring attention
 - AI-generated code patterns
 - Dangerous functions: `eval()`, `exec()`, `innerHTML`
@@ -297,6 +308,7 @@ Detected code quality problems:
 ### 9. Actionable Recommendations
 
 Prioritized list of improvements based on current scores:
+
 - Organized by category (Maintainability, Security, Structure, etc.)
 - Only shows recommendations for areas scoring below 70
 - Actionable steps to improve each area
@@ -304,6 +316,7 @@ Prioritized list of improvements based on current scores:
 ### 10. Final Summary
 
 Executive overview of findings with:
+
 - Null metrics and reasons for unavailability
 - Next steps for improvement
 - Areas of strength
@@ -368,14 +381,14 @@ Structure = 100 - Parameter Penalty + (Config Bonus × 0.2)
 
 ### Grade Thresholds
 
-| Score | Grade | Meaning |
-|-------|-------|---------|
-| 90-100 | A+ (Excellent) | ⭐⭐⭐⭐⭐ Production-ready, best practices |
-| 80-89 | A (Very Good) | ⭐⭐⭐⭐ Well-maintained, minor improvements needed |
-| 70-79 | B (Good) | ⭐⭐⭐ Acceptable, address key issues |
-| 60-69 | C (Fair) | ⭐⭐ Significant improvements needed |
-| 50-59 | D (Poor) | ⭐ Major refactoring required |
-| <50 | F (Critical) | 🚨 Immediate attention required |
+| Score  | Grade          | Meaning                                             |
+| ------ | -------------- | --------------------------------------------------- |
+| 90-100 | A+ (Excellent) | ⭐⭐⭐⭐⭐ Production-ready, best practices         |
+| 80-89  | A (Very Good)  | ⭐⭐⭐⭐ Well-maintained, minor improvements needed |
+| 70-79  | B (Good)       | ⭐⭐⭐ Acceptable, address key issues               |
+| 60-69  | C (Fair)       | ⭐⭐ Significant improvements needed                |
+| 50-59  | D (Poor)       | ⭐ Major refactoring required                       |
+| <50    | F (Critical)   | 🚨 Immediate attention required                     |
 
 ### Understanding Null Metrics
 
@@ -384,21 +397,27 @@ Some metrics may show as `null` instead of a number. This is **expected and corr
 **When does a metric become `null`?**
 
 1. **No test files found** → Testing Quality = `null`
+
    - Reason: "No tests detected"
 
 2. **No coverage reports** → Code Coverage = `null`
+
    - Reason: "No coverage configuration or reports found"
 
 3. **Lizard analysis fails** → Complexity metrics = `null`
+
    - Reason: "Lizard failed to analyze code files"
 
 4. **No documentation** → Documentation = `null`
+
    - Reason: "Insufficient documentation files"
 
 5. **No CI/CD configured** → CI/CD = `null`
+
    - Reason: "No CI/CD workflows detected"
 
 6. **API code not detected** → API Quality = `null`
+
    - Reason: "No API endpoints detected"
 
 7. **No monitoring setup** → Monitoring = `null`
@@ -414,18 +433,21 @@ This distinction helps you understand whether a low score is a real problem (0) 
 ### Interpreting Specific Metrics
 
 **Cyclomatic Complexity (CCN):**
+
 - **< 5:** Simple, easy to understand
 - **5-10:** Moderate, acceptable
 - **10-20:** Complex, difficult to test
 - **> 20:** Very complex, high maintenance cost
 
 **Code Duplication:**
+
 - **< 5%:** Excellent, minimal duplication
 - **5-10%:** Good, some duplication
 - **10-20%:** Fair, refactor to reduce
 - **> 20%:** Poor, significant duplication
 
 **Security Findings by Severity:**
+
 - **Critical:** Security breaches, data loss risks → Fix immediately
 - **High:** Potential for significant damage → Fix in current sprint
 - **Medium:** Could be exploited, but barriers exist → Fix soon
