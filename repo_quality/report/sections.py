@@ -37,15 +37,19 @@ def generate_detailed_metrics(metrics: Dict[str, Any], scores: Dict[str, Any]) -
     report += "### Complexity\n"
     report += "| Metric | Value | Grade |\n"
     report += "|--------|-------|-------|\n"
-    report += f"| Average Cyclomatic Complexity | {metrics.get('avg_ccn', 0):.1f} | {scores['ccn_grade']} |\n"
-    report += f"| Max Cyclomatic Complexity | {metrics.get('max_ccn', 0)} | - |\n"
-    report += f"| % Functions CCN > 10 | {metrics.get('pct_ccn_gt_10', 0):.1f}% | - |\n\n"
+    avg_ccn = metrics.get('avg_ccn')
+    max_ccn = metrics.get('max_ccn')
+    pct_ccn_gt_10 = metrics.get('pct_ccn_gt_10')
+    duplication_pct = metrics.get('duplication_pct')
+    report += f"| Average Cyclomatic Complexity | {format_number(avg_ccn)} | {scores.get('ccn_grade', 'N/A')} |\n"
+    report += f"| Max Cyclomatic Complexity | {format_number(max_ccn)} | - |\n"
+    report += f"| % Functions CCN > 10 | {format_number(pct_ccn_gt_10) if pct_ccn_gt_10 is not None else 'N/A'}% | - |\n\n"
 
     # Duplication
     report += "### Duplication\n"
     report += "| Metric | Value | Grade |\n"
     report += "|--------|-------|-------|\n"
-    report += f"| Code Duplication % | {metrics.get('duplication_pct', 0):.1f}% | {scores['dup_grade']} |\n\n"
+    report += f"| Code Duplication % | {format_number(duplication_pct) if duplication_pct is not None else 'N/A'}% | {scores.get('dup_grade', 'N/A')} |\n\n"
 
     # Security
     report += "### Security\n"
